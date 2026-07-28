@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Copies</title>
+</head>
+<body>
+    <h1>Available Copies</h1>
+    <ul>
+    {% for copy in copies %}
+        <li>{{ copy.book.title }} (Copy #{{ copy.copy_id }})</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
