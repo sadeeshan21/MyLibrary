@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Reservations</title></head>
+<body>
+    <h1>My Reservations</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+    {% for res in reservations %}
+        <li>
+            {{ res.book.title }} — Status: {{ res.status }}, Queue Position: {{ res.queue_position }}
+            {% if res.status == 'pending' %}
+                <form method="POST" action="{{ url_for('student_bp.cancel_reservation_route', reservation_id=res.reservation_id) }}" style="display:inline;">
+                    <button type="submit">Cancel</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>All Books</title>
-</head>
+<head><title>All Books</title></head>
 <body>
     <h1>All Books</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
     <ul>
     {% for book in books %}
-        <li>{{ book.title }} by {{ book.author }} — {{ book.category.category_name }}</li>
+        <li>
+            {{ book.title }} by {{ book.author }} — {{ book.category.category_name }}
+            <form method="POST" action="{{ url_for('student_bp.borrow', book_id=book.book_id) }}" style="display:inline;">
+                <button type="submit">Borrow</button>
+            
+            </form>
+
+           <form method="POST" action="{{ url_for('student_bp.reserve', book_id=book.book_id) }}" style="display:inline;">
+                <button type="submit">Reserve</button>
+             </form> 
+        </li>
     {% endfor %}
     </ul>
 </body>

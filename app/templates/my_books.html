@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Borrowed Books</title></head>
+<body>
+    <h1>My Borrowed Books</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+    {% for record in borrowed_books %}
+        <li>
+            {{ record.book_copy.book.title }} — Status: {{ record.status }}, Due: {{ record.due_date }}
+            {% if record.return_date is none %}
+                <form method="POST" action="{{ url_for('student_bp.return_book_route', borrow_id=record.borrow_id) }}" style="display:inline;">
+                    <button type="submit">Return</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
