@@ -1,9 +1,19 @@
 <!DOCTYPE html>
 <html>
+<head><title>Librarian Dashboard</title></head>
 <body>
     <h1>Librarian Dashboard</h1>
     <p>Welcome, {{ user.name }}!</p>
-    <p>Role: {{ user.role }}</p>
+
+    <ul>
+        <li>Total Books: {{ stats.total_books }}</li>
+        <li>Total Students: {{ stats.total_students }}</li>
+        <li>Currently Borrowed: {{ stats.currently_borrowed }}</li>
+        <li>Overdue Books: {{ stats.overdue_count }}</li>
+        <li>Seats Booked Today: {{ stats.seats_booked_today }}</li>
+        <li>Pending Reservations: {{ stats.pending_reservations }}</li>
+    </ul>
+
     <a href="{{ url_for('auth_bp.logout') }}">Logout</a>
 </body>
 </html>

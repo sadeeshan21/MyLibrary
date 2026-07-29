@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Seat Availability</title></head>
+<body>
+    <h1>Seat {{ seat.seat_number }} — {{ booking_date }}</h1>
+
+    <form method="GET">
+        <input type="date" name="date" value="{{ booking_date }}">
+        <button type="submit">Check</button>
+    </form>
+
+    <ul>
+    {% for slot in slots %}
+        <li>
+            {{ slot.start }} - {{ slot.end }}
+            {% if slot.booked %}
+                (Booked)
+            {% else %}
+                <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}" style="display:inline;">
+                    <input type="hidden" name="booking_date" value="{{ booking_date }}">
+                    <input type="hidden" name="start_time" value="{{ slot.start }}">
+                    <input type="hidden" name="end_time" value="{{ slot.end }}">
+                    <button type="submit">Book</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
