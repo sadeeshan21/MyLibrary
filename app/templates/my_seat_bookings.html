@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>My Seat Bookings</title></head>
+<body>
+    <h1>My Seat Bookings</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+    {% for booking in bookings %}
+        <li>
+            Seat {{ booking.seat.seat_number }} — {{ booking.booking_date }}, {{ booking.start_time }}–{{ booking.end_time }} — Status: {{ booking.status }}
+            {% if booking.status == 'confirmed' %}
+                <form method="POST" action="{{ url_for('student_bp.cancel_seat_booking_route', booking_id=booking.booking_id) }}" style="display:inline;">
+                    <button type="submit">Cancel</button>
+                </form>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

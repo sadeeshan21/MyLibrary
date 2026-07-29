@@ -1,7 +1,14 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app.services.borrow_service import borrow_book, return_book, BorrowError
 from app.models.models import Book, BorrowedBook
+from datetime import datetime
+from app.services.seat_service import book_seat, cancel_booking, SeatBookingError
+from app.models.models import Seat, SeatBooking, SeatZone
+
+
+
+
 
 student_bp = Blueprint('student_bp', __name__)
 
@@ -69,3 +76,43 @@ def return_book_route(borrow_id):
 def my_books():
     my_borrowed = BorrowedBook.query.filter_by(user_user_id=current_user.user_id).all()
     return render_template('my_books.html', borrowed_books=my_borrowed)
+
+
+@student_bp.route('/seats')
+@login_required
+def list_seats():
+    all_seats = Seat.query.filter_by(seat_status='active').all()
+    return render_template('seats.html', seats=all_seats)
+
+
+@student_bp.route('/seats/<int:seat_id>/book', methods=['POST'])
+@login_required
+def book_seat_route(seat_id):
+    booking_date = datetime.strptime(request.form['booking_date'], '%Y-%m-%d').date()
+    start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
+    end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
+
+    try:
+        book_seat(current_user.user_id, seat_id, booking_date, start_time, end_time)
+        flash('Seat booked successfully!')
+    except SeatBookingError as e:
+        flash(str(e))
+    return redirect(url_for('student_bp.list_seats'))
+
+
+@student_bp.route('/my-seat-bookings')
+@login_required
+def my_seat_bookings():
+    my_bookings = SeatBooking.query.filter_by(user_user_id=current_user.user_id).all()
+    return render_template('my_seat_bookings.html', bookings=my_bookings)
+
+
+@student_bp.route('/seat-bookings/<int:booking_id>/cancel', methods=['POST'])
+@login_required
+def cancel_seat_booking_route(booking_id):
+    try:
+        cancel_booking(booking_id, current_user.user_id)
+        flash('Booking cancelled.')
+    except SeatBookingError as e:
+        flash(str(e))
+    return redirect(url_for('student_bp.my_seat_bookings'))

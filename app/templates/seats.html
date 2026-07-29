@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Book a Seat</title></head>
+<body>
+    <h1>Available Seats</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+    {% for seat in seats %}
+        <li>
+            Seat {{ seat.seat_number }} ({{ seat.zone.zone_name }})
+            <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}" style="display:inline;">
+                <input type="date" name="booking_date" required>
+                <input type="time" name="start_time" required>
+                <input type="time" name="end_time" required>
+                <button type="submit">Book</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
