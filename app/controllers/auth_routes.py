@@ -18,6 +18,16 @@ def register():
         phone = request.form['phone']
         role = request.form['role']
 
+        existing_id = User.query.get(user_id)
+        if existing_id:
+            flash('This User ID is already taken. Please choose another.')
+            return redirect(url_for('auth_bp.register'))
+
+        existing_email = User.query.filter_by(email=email).first()
+        if existing_email:
+            flash('An account with this email already exists.')
+            return redirect(url_for('auth_bp.register'))
+
         hashed_password = generate_password_hash(password)
 
         new_user = User(
