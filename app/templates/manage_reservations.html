@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>Manage Reservations</title></head>
+<body>
+    <h1>Pending Reservations</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <ul>
+    {% for res in reservations %}
+        <li>
+            {{ res.user.name }} wants "{{ res.book.title }}" — Queue Position: {{ res.queue_position }}, Requested: {{ res.reservation_date }}
+            <form method="POST" action="{{ url_for('librarian_bp.approve_reservation_route', reservation_id=res.reservation_id) }}" style="display:inline;">
+                <button type="submit">Approve</button>
+            </form>
+            <form method="POST" action="{{ url_for('librarian_bp.reject_reservation_route', reservation_id=res.reservation_id) }}" style="display:inline;">
+                <button type="submit">Reject</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="{{ url_for('librarian_bp.dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

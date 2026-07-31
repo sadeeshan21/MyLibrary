@@ -3,6 +3,9 @@ from flask_login import login_required, current_user
 from app.utils import role_required
 from app.models.models import Book, BookCopy, BorrowedBook, SeatBooking, Reservation, User
 from datetime import date
+from flask import request, redirect, url_for, flash
+from app.services.reservation_service import approve_reservation, reject_reservation, ReservationError
+from app.models.models import Reservation
 
 librarian_bp = Blueprint('librarian_bp', __name__)
 
@@ -31,3 +34,34 @@ def dashboard():
     }
 
     return render_template('librarian_dashboard.html', user=current_user, stats=stats)
+
+@librarian_bp.route('/librarian/reservations')
+@login_required
+@role_required('librarian')
+def manage_reservations():
+    pending = Reservation.query.filter_by(status='pending').all()
+    return render_template('manage_reservations.html', reservations=pending)
+
+
+@librarian_bp.route('/librarian/reservations/<int:reservation_id>/approve', methods=['POST'])
+@login_required
+@role_required('librarian')
+def approve_reservation_route(reservation_id):
+    try:
+        approve_reservation(reservation_id)
+        flash('Reservation approved.')
+    except ReservationError as e:
+        flash(str(e))
+    return redirect(url_for('librarian_bp.manage_reservations'))
+
+
+@librarian_bp.route('/librarian/reservations/<int:reservation_id>/reject', methods=['POST'])
+@login_required
+@role_required('librarian')
+def reject_reservation_route(reservation_id):
+    try:
+        reject_reservation(reservation_id)
+        flash('Reservation rejected.')
+    except ReservationError as e:
+        flash(str(e))
+    return redirect(url_for('librarian_bp.manage_reservations'))

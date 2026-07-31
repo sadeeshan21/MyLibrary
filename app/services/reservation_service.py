@@ -51,3 +51,32 @@ def cancel_reservation(reservation_id, user_id):
     db.session.commit()
 
     return reservation
+
+def approve_reservation(reservation_id):
+    reservation = Reservation.query.get(reservation_id)
+
+    if reservation is None:
+        raise ReservationError("Reservation not found.")
+
+    if reservation.status != 'pending':
+        raise ReservationError("Only pending reservations can be approved.")
+
+    reservation.status = 'approved'
+    db.session.commit()
+
+    return reservation
+
+
+def reject_reservation(reservation_id):
+    reservation = Reservation.query.get(reservation_id)
+
+    if reservation is None:
+        raise ReservationError("Reservation not found.")
+
+    if reservation.status != 'pending':
+        raise ReservationError("Only pending reservations can be rejected.")
+
+    reservation.status = 'rejected'
+    db.session.commit()
+
+    return reservation
