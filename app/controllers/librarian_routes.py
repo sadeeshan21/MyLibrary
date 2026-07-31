@@ -6,8 +6,13 @@ from datetime import date
 from flask import request, redirect, url_for, flash
 from app.services.reservation_service import approve_reservation, reject_reservation, ReservationError
 from app.models.models import Reservation
+from app.services.book_service import add_book, update_book, BookError
+from app.models.models import Category
+
 
 librarian_bp = Blueprint('librarian_bp', __name__)
+
+
 
 
 @librarian_bp.route('/librarian/dashboard')
@@ -34,6 +39,8 @@ def dashboard():
     }
 
     return render_template('librarian_dashboard.html', user=current_user, stats=stats)
+
+
 
 @librarian_bp.route('/librarian/reservations')
 @login_required
@@ -65,3 +72,59 @@ def reject_reservation_route(reservation_id):
     except ReservationError as e:
         flash(str(e))
     return redirect(url_for('librarian_bp.manage_reservations'))
+
+@librarian_bp.route('/librarian/books')
+@login_required
+@role_required('librarian')
+def manage_books():
+    all_books = Book.query.all()
+    return render_template('manage_books.html', books=all_books)
+
+
+@librarian_bp.route('/librarian/books/add', methods=['GET', 'POST'])
+@login_required
+@role_required('librarian')
+def add_book_route():
+    if request.method == 'POST':
+        try:
+            add_book(
+                title=request.form['title'],
+                author=request.form['author'],
+                isbn=request.form['isbn'],
+                total_copies=int(request.form['total_copies']),
+                shelf_location=request.form['shelf_location'],
+                category_id=int(request.form['category_id'])
+            )
+            flash('Book added successfully!')
+            return redirect(url_for('librarian_bp.manage_books'))
+        except BookError as e:
+            flash(str(e))
+
+    all_categories = Category.query.all()
+    return render_template('book_form.html', book=None, categories=all_categories)
+
+
+@librarian_bp.route('/librarian/books/<int:book_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required('librarian')
+def edit_book_route(book_id):
+    book = Book.query.get_or_404(book_id)
+
+    if request.method == 'POST':
+        try:
+            update_book(
+                book_id=book_id,
+                title=request.form['title'],
+                author=request.form['author'],
+                isbn=request.form['isbn'],
+                total_copies=int(request.form['total_copies']),
+                shelf_location=request.form['shelf_location'],
+                category_id=int(request.form['category_id'])
+            )
+            flash('Book updated successfully!')
+            return redirect(url_for('librarian_bp.manage_books'))
+        except BookError as e:
+            flash(str(e))
+
+    all_categories = Category.query.all()
+    return render_template('book_form.html', book=book, categories=all_categories)

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>{% if book %}Edit Book{% else %}Add Book{% endif %}</title></head>
+<body>
+    <h1>{% if book %}Edit Book{% else %}Add New Book{% endif %}</h1>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+        {% endif %}
+    {% endwith %}
+    <form method="POST">
+        <input type="text" name="title" placeholder="Title" value="{{ book.title if book else '' }}" required><br>
+        <input type="text" name="author" placeholder="Author" value="{{ book.author if book else '' }}" required><br>
+        <input type="text" name="isbn" placeholder="ISBN" value="{{ book.isbn if book else '' }}" required><br>
+        <input type="number" name="total_copies" placeholder="Total Copies" value="{{ book.total_copies if book else '' }}" required><br>
+        <input type="text" name="shelf_location" placeholder="Shelf Location" value="{{ book.shelf_location if book else '' }}"><br>
+        <select name="category_id" required>
+            {% for cat in categories %}
+                <option value="{{ cat.category_id }}" {% if book and book.category_category_id == cat.category_id %}selected{% endif %}>
+                    {{ cat.category_name }}
+                </option>
+            {% endfor %}
+        </select><br>
+        <button type="submit">{% if book %}Update{% else %}Add{% endif %}</button>
+    </form>
+</body>
+</html>
