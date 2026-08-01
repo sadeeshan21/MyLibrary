@@ -78,8 +78,8 @@ def reject_reservation_route(reservation_id):
 @role_required('librarian')
 def manage_books():
     all_books = Book.query.all()
-    return render_template('manage_books.html', books=all_books)
-
+    all_categories = Category.query.all()
+    return render_template('manage_books.html', books=all_books, categories=all_categories)
 
 @librarian_bp.route('/librarian/books/add', methods=['GET', 'POST'])
 @login_required

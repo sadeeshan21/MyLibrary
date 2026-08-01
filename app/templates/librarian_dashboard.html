@@ -1,19 +1,93 @@
-<!DOCTYPE html>
-<html>
-<head><title>Librarian Dashboard</title></head>
-<body>
-    <h1>Librarian Dashboard</h1>
-    <p>Welcome, {{ user.name }}!</p>
+{% extends "base.html" %}
+{% block title %}Dashboard · NSBM Library{% endblock %}
+{% block content %}
 
-    <ul>
-        <li>Total Books: {{ stats.total_books }}</li>
-        <li>Total Students: {{ stats.total_students }}</li>
-        <li>Currently Borrowed: {{ stats.currently_borrowed }}</li>
-        <li>Overdue Books: {{ stats.overdue_count }}</li>
-        <li>Seats Booked Today: {{ stats.seats_booked_today }}</li>
-        <li>Pending Reservations: {{ stats.pending_reservations }}</li>
-    </ul>
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">LIBRARY OPERATIONS</div>
+        <h1>Welcome, {{ user.name }}</h1>
+        <p>Here's what's happening across the library today.</p>
+    </div>
+</section>
 
-    <a href="{{ url_for('auth_bp.logout') }}">Logout</a>
-</body>
-</html>
+<div class="row g-4 metric-row">
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top">
+                <div class="metric-icon blue"><i class="bi bi-journals"></i></div>
+            </div>
+            <span class="metric-label">Total books</span>
+            <div class="metric-value">{{ stats.total_books }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top">
+                <div class="metric-icon teal"><i class="bi bi-people"></i></div>
+            </div>
+            <span class="metric-label">Total students</span>
+            <div class="metric-value">{{ stats.total_students }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top">
+                <div class="metric-icon cyan"><i class="bi bi-arrow-left-right"></i></div>
+            </div>
+            <span class="metric-label">Currently borrowed</span>
+            <div class="metric-value">{{ stats.currently_borrowed }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top">
+                <div class="metric-icon amber"><i class="bi bi-clock-history"></i></div>
+            </div>
+            <span class="metric-label">Overdue books</span>
+            <div class="metric-value">{{ stats.overdue_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-1">
+    <div class="col-12 col-xxl-6">
+        <section class="panel h-100">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-kicker">TODAY</div>
+                    <h3>Seats booked today</h3>
+                </div>
+            </div>
+            <div class="chart-wrap d-flex align-items-center justify-content-center">
+                <div class="metric-value" style="font-size:3rem;">{{ stats.seats_booked_today }}</div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-12 col-xxl-6">
+        <section class="panel h-100">
+            <div class="panel-header">
+                <div>
+                    <div class="panel-kicker">ATTENTION</div>
+                    <h3>Priority queue</h3>
+                </div>
+            </div>
+            <div class="attention-list">
+                <a href="{{ url_for('librarian_bp.manage_reservations') }}">
+                    <div class="attention-icon ready"><i class="bi bi-bookmark-check"></i></div>
+                    <div><b>{{ stats.pending_reservations }} pending reservations</b><span>Awaiting review</span></div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% if stats.overdue_count > 0 %}
+                <a href="#">
+                    <div class="attention-icon danger"><i class="bi bi-exclamation-triangle"></i></div>
+                    <div><b>{{ stats.overdue_count }} overdue books</b><span>Follow-up recommended</span></div>
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock %}

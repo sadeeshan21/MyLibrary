@@ -1,27 +1,60 @@
-<!DOCTYPE html>
-<html>
-<head><title>All Books</title></head>
-<body>
-    <h1>All Books</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
-        {% endif %}
-    {% endwith %}
-    <ul>
-    {% for book in books %}
-        <li>
-            {{ book.title }} by {{ book.author }} — {{ book.category.category_name }}
-            <form method="POST" action="{{ url_for('student_bp.borrow', book_id=book.book_id) }}" style="display:inline;">
-                <button type="submit">Borrow</button>
-            
-            </form>
+{% extends "base.html" %}
+{% block title %}Browse Books ·MyLibrary {% endblock %}
+{% block content %}
 
-           <form method="POST" action="{{ url_for('student_bp.reserve', book_id=book.book_id) }}" style="display:inline;">
-                <button type="submit">Reserve</button>
-             </form> 
-        </li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">COLLECTION</div>
+        <h1>Browse books</h1>
+        <p>Search and borrow from the library's collection.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>BOOK DETAILS</th>
+                    <th>ISBN</th>
+                    <th>CATEGORY</th>
+                    <th>LOCATION</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>
+                        <div class="book-cell">
+                            <div class="book-cover">
+                                <span>{{ book.title[0] }}</span>
+                                <small>LIBRARY</small>
+                            </div>
+                            <div>
+                                <b>{{ book.title }}</b>
+                                <span>{{ book.author }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code class="accession">{{ book.isbn }}</code></td>
+                    <td><span class="category-chip">{{ book.category.category_name }}</span></td>
+                    <td><b>{{ book.shelf_location or '—' }}</b></td>
+                    <td class="text-end">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <form method="POST" action="{{ url_for('student_bp.borrow', book_id=book.book_id) }}">
+                                <button type="submit" class="btn primary-btn btn-sm">Borrow</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('student_bp.reserve', book_id=book.book_id) }}">
+                                <button type="submit" class="btn secondary-btn btn-sm">Reserve</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

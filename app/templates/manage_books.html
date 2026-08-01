@@ -1,17 +1,108 @@
-<!DOCTYPE html>
-<html>
-<head><title>Manage Books</title></head>
-<body>
-    <h1>Manage Books</h1>
-    <a href="{{ url_for('librarian_bp.add_book_route') }}">Add New Book</a>
-    <ul>
-    {% for book in books %}
-        <li>
-            {{ book.title }} by {{ book.author }} — {{ book.category.category_name }} ({{ book.total_copies }} copies)
-            <a href="{{ url_for('librarian_bp.edit_book_route', book_id=book.book_id) }}">Edit</a>
-        </li>
-    {% endfor %}
-    </ul>
-    <a href="{{ url_for('librarian_bp.dashboard') }}">Back to Dashboard</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Manage Books · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">COLLECTION MANAGEMENT</div>
+        <h1>Library catalog</h1>
+        <p>Manage the complete library collection.</p>
+    </div>
+    <div class="heading-actions">
+        <button class="btn primary-btn" data-bs-toggle="modal" data-bs-target="#addBookModal"><i class="bi bi-plus-lg"></i> Add book</button>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>BOOK DETAILS</th>
+                    <th>ISBN</th>
+                    <th>CATEGORY</th>
+                    <th>COPIES</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <td>
+                        <div class="book-cell">
+                            <div class="book-cover">
+                                <span>{{ book.title[0] }}</span>
+                                <small>LIBRARY</small>
+                            </div>
+                            <div>
+                                <b>{{ book.title }}</b>
+                                <span>{{ book.author }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code class="accession">{{ book.isbn }}</code></td>
+                    <td><span class="category-chip">{{ book.category.category_name }}</span></td>
+                    <td><b>{{ book.total_copies }}</b></td>
+                    <td class="text-end">
+                        <a href="{{ url_for('librarian_bp.edit_book_route', book_id=book.book_id) }}" class="btn secondary-btn btn-sm">Edit</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="modal fade" id="addBookModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modern-modal">
+            <form method="POST" action="{{ url_for('librarian_bp.add_book_route') }}">
+                <div class="modal-header">
+                    <div>
+                        <span class="modal-kicker">CATALOG</span>
+                        <h3 class="modal-title">Add new book</h3>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Book title</label>
+                            <input class="form-control pro-control" name="title" placeholder="Enter title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ISBN</label>
+                            <input class="form-control pro-control" name="isbn" placeholder="978..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Author</label>
+                            <input class="form-control pro-control" name="author" placeholder="Author name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category</label>
+                            <select class="form-select pro-control" name="category_id" required>
+                                {% for cat in categories %}
+                                <option value="{{ cat.category_id }}">{{ cat.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total copies</label>
+                            <input class="form-control pro-control" name="total_copies" value="1" type="number" min="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Shelf location</label>
+                            <input class="form-control pro-control" name="shelf_location" placeholder="A-12">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn secondary-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn primary-btn">Create catalog record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
