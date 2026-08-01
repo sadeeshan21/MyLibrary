@@ -24,8 +24,17 @@
                     <td>{{ booking.start_time.strftime('%H:%M') }} - {{ booking.end_time.strftime('%H:%M') }}</td>
                     <td>
                         {% if booking.status == 'confirmed' %}<span class="status-pill ready">Confirmed</span>
+                        {% elif booking.status == 'pending' %}<span class="status-pill neutral">Pending</span>
+                        {% elif booking.status == 'rejected' %}<span class="status-pill danger">Rejected</span>
                         {% elif booking.status == 'cancelled' %}<span class="status-pill danger">Cancelled</span>
                         {% else %}<span class="status-pill neutral">{{ booking.status|capitalize }}</span>{% endif %}
+
+                        {% if booking.status in ['confirmed', 'pending'] %}
+                        <form method="POST" action="{{ url_for('student_bp.cancel_seat_booking_route', booking_id=booking.booking_id) }}">
+                            <button type="submit" class="btn secondary-btn btn-sm">Cancel</button>
+                        </form>
+                        {% endif %}
+
                     </td>
                     <td class="text-end">
                         {% if booking.status == 'confirmed' %}

@@ -137,7 +137,7 @@ class SeatBooking(db.Model):
     booking_date = db.Column(db.Date, nullable=False)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
-    status = db.Column(db.Enum('confirmed', 'cancelled', 'no_show'), nullable=False, default='confirmed')
+    status = db.Column(db.Enum('pending', 'confirmed', 'cancelled', 'rejected', 'no_show'), nullable=False, default='pending')
     seat_seat_id = db.Column(db.Integer, db.ForeignKey('seat.seat_id'), nullable=False)
     user_user_id = db.Column(db.String(16), db.ForeignKey('user.user_id'), nullable=False)
 

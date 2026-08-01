@@ -7,7 +7,9 @@ from flask import request, redirect, url_for, flash
 from app.services.reservation_service import approve_reservation, reject_reservation, ReservationError
 from app.models.models import Reservation
 from app.services.book_service import add_book, update_book, BookError
-from app.models.models import Category
+from app.services.seat_service import approve_seat_booking, reject_seat_booking, SeatBookingActionError
+from app.models.models import SeatBooking
+from app.models.models import Book, BookCopy, BorrowedBook, SeatBooking, Reservation, User, Category
 
 
 librarian_bp = Blueprint('librarian_bp', __name__)
@@ -128,3 +130,34 @@ def edit_book_route(book_id):
 
     all_categories = Category.query.all()
     return render_template('book_form.html', book=book, categories=all_categories)
+
+@librarian_bp.route('/librarian/seat-bookings')
+@login_required
+@role_required('librarian')
+def manage_seat_bookings():
+    pending = SeatBooking.query.filter_by(status='pending').all()
+    return render_template('manage_seat_bookings.html', bookings=pending)
+
+
+@librarian_bp.route('/librarian/seat-bookings/<int:booking_id>/approve', methods=['POST'])
+@login_required
+@role_required('librarian')
+def approve_seat_booking_route(booking_id):
+    try:
+        approve_seat_booking(booking_id)
+        flash('Seat booking approved.')
+    except SeatBookingActionError as e:
+        flash(str(e))
+    return redirect(url_for('librarian_bp.manage_seat_bookings'))
+
+
+@librarian_bp.route('/librarian/seat-bookings/<int:booking_id>/reject', methods=['POST'])
+@login_required
+@role_required('librarian')
+def reject_seat_booking_route(booking_id):
+    try:
+        reject_seat_booking(booking_id)
+        flash('Seat booking rejected.')
+    except SeatBookingActionError as e:
+        flash(str(e))
+    return redirect(url_for('librarian_bp.manage_seat_bookings'))

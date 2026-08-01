@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Seat Bookings · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">STUDY SPACE</div>
+        <h1>Pending seat bookings</h1>
+        <p>Review and act on outstanding seat booking requests.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr><th>MEMBER</th><th>SEAT</th><th>DATE</th><th>TIME</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="table-avatar">{{ b.user.name[0] }}</div>
+                            <div><b>{{ b.user.name }}</b><span>{{ b.user.role|capitalize }}</span></div>
+                        </div>
+                    </td>
+                    <td><b>{{ b.seat.seat_number }}</b></td>
+                    <td>{{ b.booking_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</td>
+                    <td class="text-end">
+                        <div class="d-flex gap-2 justify-content-end">
+                            <form method="POST" action="{{ url_for('librarian_bp.approve_seat_booking_route', booking_id=b.booking_id) }}">
+                                <button type="submit" class="btn primary-btn btn-sm">Approve</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('librarian_bp.reject_seat_booking_route', booking_id=b.booking_id) }}">
+                                <button type="submit" class="btn secondary-btn btn-sm">Reject</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No pending seat bookings.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

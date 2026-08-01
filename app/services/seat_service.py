@@ -33,7 +33,7 @@ def book_seat(user_id, seat_id, booking_date, start_time, end_time):
     conflicting_bookings = db.session.query(SeatBooking).filter(
         SeatBooking.seat_seat_id == seat_id,
         SeatBooking.booking_date == booking_date,
-        SeatBooking.status != 'cancelled',
+        SeatBooking.status.notin_(['cancelled', 'rejected']),
         SeatBooking.start_time < end_time,
         SeatBooking.end_time > start_time
     ).with_for_update().all()
@@ -45,7 +45,7 @@ def book_seat(user_id, seat_id, booking_date, start_time, end_time):
         booking_date=booking_date,
         start_time=start_time,
         end_time=end_time,
-        status='confirmed',
+        status='pending',
         seat_seat_id=seat_id,
         user_user_id=user_id
     )
@@ -121,3 +121,30 @@ def get_seats_status_for_slot(seats, booking_date, start_time, end_time):
         seat.seat_id: ('full' if seat.seat_id in booked_seat_ids else 'available')
         for seat in seats
     }
+
+class SeatBookingActionError(Exception):
+    pass
+
+
+def approve_seat_booking(booking_id):
+    booking = SeatBooking.query.get(booking_id)
+    if booking is None:
+        raise SeatBookingActionError("Booking not found.")
+    if booking.status != 'pending':
+        raise SeatBookingActionError("Only pending bookings can be approved.")
+
+    booking.status = 'confirmed'
+    db.session.commit()
+    return booking
+
+
+def reject_seat_booking(booking_id):
+    booking = SeatBooking.query.get(booking_id)
+    if booking is None:
+        raise SeatBookingActionError("Booking not found.")
+    if booking.status != 'pending':
+        raise SeatBookingActionError("Only pending bookings can be rejected.")
+
+    booking.status = 'rejected'
+    db.session.commit()
+    return booking

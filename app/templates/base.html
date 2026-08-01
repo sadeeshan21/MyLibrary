@@ -25,6 +25,9 @@
 
         {% if current_user.is_authenticated and current_user.role == 'librarian' %}
         <nav class="side-nav">
+            <a class="side-link {% if request.endpoint == 'librarian_bp.manage_seat_bookings' %}active{% endif %}" href="{{ url_for('librarian_bp.manage_seat_bookings') }}">
+                <i class="bi bi-calendar-check"></i><span>Seat Bookings</span>
+            </a>
             <a class="side-link {% if request.endpoint == 'librarian_bp.dashboard' %}active{% endif %}" href="{{ url_for('librarian_bp.dashboard') }}">
                 <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
             </a>
