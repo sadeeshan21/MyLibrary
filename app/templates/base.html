@@ -49,7 +49,7 @@
             <a class="side-link {% if request.endpoint == 'student_bp.my_reservations' %}active{% endif %}" href="{{ url_for('student_bp.my_reservations') }}">
                 <i class="bi bi-bookmark-check"></i><span>My Reservations</span>
             </a>
-            <a class="side-link {% if request.endpoint == 'student_bp.list_seats' %}active{% endif %}" href="{{ url_for('student_bp.list_seats') }}">
+            <a class="side-link {% if request.endpoint == 'student_bp.select_seat_time' %}active{% endif %}" href="{{ url_for('student_bp.select_seat_time') }}">
                 <i class="bi bi-grid-3x3-gap"></i><span>Book a Seat</span>
             </a>
             <a class="side-link {% if request.endpoint == 'student_bp.my_seat_bookings' %}active{% endif %}" href="{{ url_for('student_bp.my_seat_bookings') }}">

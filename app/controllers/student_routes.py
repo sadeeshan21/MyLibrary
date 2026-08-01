@@ -9,8 +9,10 @@ from app.services.reservation_service import reserve_book, cancel_reservation, R
 from app.models.models import Reservation
 from app.services.seat_service import get_seat_availability
 from datetime import datetime as dt
-
-
+from app.services.seat_service import get_seat_availability, book_seat, cancel_booking, SeatBookingError, get_seats_with_today_status
+from app.services.seat_service import LIBRARY_HOURS, get_seats_status_for_slot
+from datetime import datetime as dt, timedelta
+from datetime import datetime, date, time
 
 student_bp = Blueprint('student_bp', __name__)
 
@@ -80,9 +82,20 @@ def my_books():
 @student_bp.route('/seats')
 @login_required
 def list_seats():
-    all_seats = Seat.query.filter_by(seat_status='active').all()
-    return render_template('seats.html', seats=all_seats)
+    all_seats = Seat.query.filter_by(seat_status='active').filter(Seat.desk_type.isnot(None)).all()
 
+    quad_seats = [s for s in all_seats if s.desk_type == 'quad']
+    pair_seats = [s for s in all_seats if s.desk_type == 'pair']
+    single_seats = [s for s in all_seats if s.desk_type == 'single']
+
+    # Group quad/pair seats by their desk
+    from itertools import groupby
+    quad_desks = {k: list(v) for k, v in groupby(sorted(quad_seats, key=lambda s: s.desk_group), key=lambda s: s.desk_group)}
+    pair_desks = {k: list(v) for k, v in groupby(sorted(pair_seats, key=lambda s: s.desk_group), key=lambda s: s.desk_group)}
+
+    seat_status = get_seats_with_today_status(all_seats)
+
+    return render_template('seats.html', quad_desks=quad_desks, pair_desks=pair_desks, single_seats=single_seats, seat_status=seat_status, total_seats=len(all_seats))
 
 
 
@@ -109,7 +122,8 @@ def cancel_seat_booking_route(booking_id):
 def book_seat_route(seat_id):
     booking_date_str = request.form['booking_date']
     booking_date = datetime.strptime(booking_date_str, '%Y-%m-%d').date()
-    start_time = datetime.strptime(request.form['start_time'], '%H:%M:%S').time()
+    start_time_str = request.form['start_time']
+    start_time = datetime.strptime(start_time_str, '%H:%M:%S').time()
     end_time = datetime.strptime(request.form['end_time'], '%H:%M:%S').time()
 
     try:
@@ -118,7 +132,7 @@ def book_seat_route(seat_id):
     except SeatBookingError as e:
         flash(str(e))
 
-    return redirect(url_for('student_bp.seat_availability', seat_id=seat_id, date=booking_date_str))
+    return redirect(url_for('student_bp.seating_plan', date=booking_date_str, start=start_time_str))
 
 @student_bp.route('/seats/<int:seat_id>/availability')
 @login_required
@@ -133,3 +147,51 @@ def seat_availability(seat_id):
     slots = get_seat_availability(seat_id, booking_date)
 
     return render_template('seat_availability.html', seat=seat, booking_date=booking_date, slots=slots)
+
+from app.services.seat_service import LIBRARY_HOURS, get_seats_status_for_slot
+
+@student_bp.route('/seats/select-time', methods=['GET', 'POST'])
+@login_required
+def select_seat_time():
+    if request.method == 'POST':
+        selected_date = request.form['booking_date']
+        selected_start = request.form['selected_slot']  # e.g. "09:00:00"
+        return redirect(url_for('student_bp.seating_plan', date=selected_date, start=selected_start))
+
+    today_str = date.today().isoformat()
+    slots = [{'start': time(h, 0), 'end': time(h+1, 0)} for h, _ in LIBRARY_HOURS]
+    return render_template('select_seat_time.html', slots=slots, today=today_str)
+
+
+@student_bp.route('/seats/plan')
+@login_required
+def seating_plan():
+    date_str = request.args.get('date')
+    start_str = request.args.get('start')
+
+    if not date_str or not start_str:
+        return redirect(url_for('student_bp.select_seat_time'))
+
+    booking_date = dt.strptime(date_str, '%Y-%m-%d').date()
+    start_time_obj = dt.strptime(start_str, '%H:%M:%S').time()
+    end_dt = dt.combine(booking_date, start_time_obj) + timedelta(hours=1)
+    end_time_obj = end_dt.time()
+
+    all_seats = Seat.query.filter_by(seat_status='active').filter(Seat.desk_type.isnot(None)).all()
+
+    quad_seats = [s for s in all_seats if s.desk_type == 'quad']
+    pair_seats = [s for s in all_seats if s.desk_type == 'pair']
+    single_seats = [s for s in all_seats if s.desk_type == 'single']
+
+    from itertools import groupby
+    quad_desks = {k: list(v) for k, v in groupby(sorted(quad_seats, key=lambda s: s.desk_group), key=lambda s: s.desk_group)}
+    pair_desks = {k: list(v) for k, v in groupby(sorted(pair_seats, key=lambda s: s.desk_group), key=lambda s: s.desk_group)}
+
+    seat_status = get_seats_status_for_slot(all_seats, booking_date, start_time_obj, end_time_obj)
+
+    return render_template('seating_plan.html',
+        quad_desks=quad_desks, pair_desks=pair_desks, single_seats=single_seats,
+        seat_status=seat_status, total_seats=len(all_seats),
+        booking_date=date_str, start_time=start_str, end_time=end_time_obj.strftime('%H:%M:%S'),
+        display_start=start_time_obj.strftime('%H:%M'), display_end=end_time_obj.strftime('%H:%M')
+    )

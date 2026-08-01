@@ -1,24 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head><title>My Borrowed Books</title></head>
-<body>
-    <h1>My Borrowed Books</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
-        {% endif %}
-    {% endwith %}
-    <ul>
-    {% for record in borrowed_books %}
-        <li>
-            {{ record.book_copy.book.title }} — Status: {{ record.status }}, Due: {{ record.due_date }}
-            {% if record.return_date is none %}
-                <form method="POST" action="{{ url_for('student_bp.return_book_route', borrow_id=record.borrow_id) }}" style="display:inline;">
-                    <button type="submit">Return</button>
-                </form>
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}My Books · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">CIRCULATION</div>
+        <h1>My borrowed books</h1>
+        <p>Track your active loans and return them when you're done.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>BOOK</th>
+                    <th>DUE DATE</th>
+                    <th>STATUS</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in borrowed_books %}
+                <tr>
+                    <td>
+                        <div class="book-cell">
+                            <div class="book-cover"><span>{{ record.book_copy.book.title[0] }}</span><small>LIBRARY</small></div>
+                            <div><b>{{ record.book_copy.book.title }}</b><span>{{ record.book_copy.book.author }}</span></div>
+                        </div>
+                    </td>
+                    <td>{{ record.due_date.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if record.status == 'overdue' %}
+                            <span class="status-pill danger">Overdue</span>
+                        {% elif record.status == 'returned' %}
+                            <span class="status-pill neutral">Returned</span>
+                        {% else %}
+                            <span class="status-pill ready">Active</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if record.return_date is none %}
+                        <form method="POST" action="{{ url_for('student_bp.return_book_route', borrow_id=record.borrow_id) }}">
+                            <button type="submit" class="btn secondary-btn btn-sm">Return</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-muted py-4">You haven't borrowed any books yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,27 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head><title>{% if book %}Edit Book{% else %}Add Book{% endif %}</title></head>
-<body>
-    <h1>{% if book %}Edit Book{% else %}Add New Book{% endif %}</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
-        {% endif %}
-    {% endwith %}
+{% extends "base.html" %}
+{% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %} · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">COLLECTION MANAGEMENT</div>
+        <h1>{% if book %}Edit book{% else %}Add new book{% endif %}</h1>
+    </div>
+</section>
+
+<section class="panel">
     <form method="POST">
-        <input type="text" name="title" placeholder="Title" value="{{ book.title if book else '' }}" required><br>
-        <input type="text" name="author" placeholder="Author" value="{{ book.author if book else '' }}" required><br>
-        <input type="text" name="isbn" placeholder="ISBN" value="{{ book.isbn if book else '' }}" required><br>
-        <input type="number" name="total_copies" placeholder="Total Copies" value="{{ book.total_copies if book else '' }}" required><br>
-        <input type="text" name="shelf_location" placeholder="Shelf Location" value="{{ book.shelf_location if book else '' }}"><br>
-        <select name="category_id" required>
-            {% for cat in categories %}
-                <option value="{{ cat.category_id }}" {% if book and book.category_category_id == cat.category_id %}selected{% endif %}>
-                    {{ cat.category_name }}
-                </option>
-            {% endfor %}
-        </select><br>
-        <button type="submit">{% if book %}Update{% else %}Add{% endif %}</button>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Book title</label>
+                <input class="form-control pro-control" name="title" value="{{ book.title if book else '' }}" required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">ISBN</label>
+                <input class="form-control pro-control" name="isbn" value="{{ book.isbn if book else '' }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Author</label>
+                <input class="form-control pro-control" name="author" value="{{ book.author if book else '' }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <select class="form-select pro-control" name="category_id" required>
+                    {% for cat in categories %}
+                    <option value="{{ cat.category_id }}" {% if book and book.category_category_id == cat.category_id %}selected{% endif %}>{{ cat.category_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Total copies</label>
+                <input class="form-control pro-control" name="total_copies" type="number" min="1" value="{{ book.total_copies if book else 1 }}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Shelf location</label>
+                <input class="form-control pro-control" name="shelf_location" value="{{ book.shelf_location if book else '' }}">
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn primary-btn">{% if book %}Update book{% else %}Add book{% endif %}</button>
+            <a href="{{ url_for('librarian_bp.manage_books') }}" class="btn secondary-btn">Cancel</a>
+        </div>
     </form>
-</body>
-</html>
+</section>
+
+{% endblock %}

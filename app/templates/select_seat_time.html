@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Book a Seat · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">STUDY SPACE</div>
+        <h1>Book a seat</h1>
+        <p>Choose a date and time, then pick your seat.</p>
+    </div>
+</section>
+
+<section class="panel">
+    <form method="POST">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control pro-control" name="booking_date" value="{{ today }}" min="{{ today }}" required>
+            </div>
+        </div>
+
+        <label class="form-label mt-4 d-block">Select a time slot</label>
+        <div class="row g-3">
+            {% for slot in slots %}
+            <div class="col-6 col-md-3">
+                <input type="radio" class="btn-check" name="selected_slot" id="slot{{ loop.index }}" value="{{ slot.start }}" required>
+                <label class="slot-radio-card" for="slot{{ loop.index }}">
+                    {{ slot.start.strftime('%H:%M') }} - {{ slot.end.strftime('%H:%M') }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn primary-btn mt-4">View seating plan <i class="bi bi-arrow-right"></i></button>
+    </form>
+</section>
+
+{% endblock %}

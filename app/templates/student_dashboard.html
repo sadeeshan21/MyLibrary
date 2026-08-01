@@ -1,9 +1,64 @@
-<!DOCTYPE html>
-<html>
-<body>
-    <h1>Student Dashboard</h1>
-    <p>Welcome, {{ user.name }}!</p>
-    <p>Role: {{ user.role }}</p>
-    <a href="{{ url_for('auth_bp.logout') }}">Logout</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Dashboard · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">STUDENT PORTAL</div>
+        <h1>Welcome, {{ user.name }}</h1>
+        <p>Here's a quick look at your library activity.</p>
+    </div>
+</section>
+
+<div class="row g-4 metric-row">
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top"><div class="metric-icon blue"><i class="bi bi-journals"></i></div></div>
+            <span class="metric-label">Books borrowed</span>
+            <div class="metric-value">{{ user.borrowed_books|selectattr('return_date', 'none')|list|length }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top"><div class="metric-icon amber"><i class="bi bi-clock-history"></i></div></div>
+            <span class="metric-label">Overdue</span>
+            <div class="metric-value">{{ user.borrowed_books|selectattr('status', 'equalto', 'overdue')|list|length }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top"><div class="metric-icon teal"><i class="bi bi-bookmark-check"></i></div></div>
+            <span class="metric-label">Active reservations</span>
+            <div class="metric-value">{{ user.reservations|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xxl-3">
+        <div class="metric-card">
+            <div class="metric-top"><div class="metric-icon cyan"><i class="bi bi-calendar-check"></i></div></div>
+            <span class="metric-label">Seat bookings</span>
+            <div class="metric-value">{{ user.seat_bookings|selectattr('status', 'equalto', 'confirmed')|list|length }}</div>
+        </div>
+    </div>
+</div>
+
+<section class="panel mt-4">
+    <div class="panel-header">
+        <div><div class="panel-kicker">QUICK ACTIONS</div><h3>Get started</h3></div>
+    </div>
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('book_bp.list_books') }}" class="btn secondary-btn w-100">Browse Books</a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('student_bp.list_seats') }}" class="btn secondary-btn w-100">Book a Seat</a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('student_bp.my_books') }}" class="btn secondary-btn w-100">My Books</a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{{ url_for('student_bp.my_reservations') }}" class="btn secondary-btn w-100">My Reservations</a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -127,7 +127,8 @@ class Seat(db.Model):
     seat_number = db.Column(db.String(10), nullable=False)
     seat_status = db.Column(db.Enum('active', 'maintenance'), nullable=False, default='active')
     seat_zone_zone_id = db.Column(db.Integer, db.ForeignKey('seat_zone.zone_id'), nullable=False)
-
+    desk_group = db.Column(db.String(10), nullable=True)
+    desk_type = db.Column(db.Enum('quad', 'pair', 'single'), nullable=False, default='single')
 
 class SeatBooking(db.Model):
     __tablename__ = 'seat_booking'

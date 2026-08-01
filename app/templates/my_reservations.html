@@ -1,24 +1,51 @@
-<!DOCTYPE html>
-<html>
-<head><title>My Reservations</title></head>
-<body>
-    <h1>My Reservations</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
-        {% endif %}
-    {% endwith %}
-    <ul>
-    {% for res in reservations %}
-        <li>
-            {{ res.book.title }} — Status: {{ res.status }}, Queue Position: {{ res.queue_position }}
-            {% if res.status == 'pending' %}
-                <form method="POST" action="{{ url_for('student_bp.cancel_reservation_route', reservation_id=res.reservation_id) }}" style="display:inline;">
-                    <button type="submit">Cancel</button>
-                </form>
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}My Reservations · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">RESERVATIONS</div>
+        <h1>My reservations</h1>
+        <p>Books you've reserved while waiting for a copy to become available.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>BOOK</th>
+                    <th>QUEUE POSITION</th>
+                    <th>STATUS</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for res in reservations %}
+                <tr>
+                    <td><b>{{ res.book.title }}</b></td>
+                    <td><span class="category-chip">#{{ res.queue_position }}</span></td>
+                    <td>
+                        {% if res.status == 'pending' %}<span class="status-pill ready">Pending</span>
+                        {% elif res.status == 'approved' %}<span class="status-pill ready">Approved</span>
+                        {% elif res.status == 'rejected' %}<span class="status-pill danger">Rejected</span>
+                        {% else %}<span class="status-pill neutral">{{ res.status|capitalize }}</span>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if res.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('student_bp.cancel_reservation_route', reservation_id=res.reservation_id) }}">
+                            <button type="submit" class="btn secondary-btn btn-sm">Cancel</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" class="text-center text-muted py-4">You have no reservations.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

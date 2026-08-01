@@ -1,24 +1,46 @@
-<!DOCTYPE html>
-<html>
-<head><title>My Seat Bookings</title></head>
-<body>
-    <h1>My Seat Bookings</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
-        {% endif %}
-    {% endwith %}
-    <ul>
-    {% for booking in bookings %}
-        <li>
-            Seat {{ booking.seat.seat_number }} — {{ booking.booking_date }}, {{ booking.start_time }}–{{ booking.end_time }} — Status: {{ booking.status }}
-            {% if booking.status == 'confirmed' %}
-                <form method="POST" action="{{ url_for('student_bp.cancel_seat_booking_route', booking_id=booking.booking_id) }}" style="display:inline;">
-                    <button type="submit">Cancel</button>
-                </form>
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}My Seat Bookings · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">STUDY SPACE</div>
+        <h1>My seat bookings</h1>
+        <p>Your upcoming and past seat reservations.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr><th>SEAT</th><th>DATE</th><th>TIME</th><th>STATUS</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td><b>{{ booking.seat.seat_number }}</b></td>
+                    <td>{{ booking.booking_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ booking.start_time.strftime('%H:%M') }} - {{ booking.end_time.strftime('%H:%M') }}</td>
+                    <td>
+                        {% if booking.status == 'confirmed' %}<span class="status-pill ready">Confirmed</span>
+                        {% elif booking.status == 'cancelled' %}<span class="status-pill danger">Cancelled</span>
+                        {% else %}<span class="status-pill neutral">{{ booking.status|capitalize }}</span>{% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if booking.status == 'confirmed' %}
+                        <form method="POST" action="{{ url_for('student_bp.cancel_seat_booking_route', booking_id=booking.booking_id) }}">
+                            <button type="submit" class="btn secondary-btn btn-sm">Cancel</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No seat bookings yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

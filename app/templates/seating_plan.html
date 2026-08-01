@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Seating Plan · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">{{ booking_date }} · {{ display_start }} - {{ display_end }}</div>
+        <h1>Choose your seat</h1>
+        <p>Green seats are available for this time slot.</p>
+    </div>
+    <div class="seat-legend">
+        <div><span class="legend-dot available"></span> Available</div>
+        <div><span class="legend-dot booked"></span> Booked</div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-9">
+
+        <h5 class="seat-section-title">4-Seater Desks</h5>
+        <div class="desk-row">
+            {% for desk_name, seats in quad_desks.items()|sort %}
+            <div class="desk-cluster quad">
+                <div class="desk-seats-top">
+                    {% for seat in seats[:2] %}
+                        {% if seat_status[seat.seat_id] == 'available' %}
+                        <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}">
+                            <input type="hidden" name="booking_date" value="{{ booking_date }}">
+                            <input type="hidden" name="start_time" value="{{ start_time }}">
+                            <input type="hidden" name="end_time" value="{{ end_time }}">
+                            <button type="submit" class="seat-node available"><i class="bi bi-person-fill"></i></button>
+                        </form>
+                        {% else %}
+                        <span class="seat-node full"><i class="bi bi-person-fill"></i></span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="desk-table"></div>
+                <div class="desk-seats-bottom">
+                    {% for seat in seats[2:] %}
+                        {% if seat_status[seat.seat_id] == 'available' %}
+                        <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}">
+                            <input type="hidden" name="booking_date" value="{{ booking_date }}">
+                            <input type="hidden" name="start_time" value="{{ start_time }}">
+                            <input type="hidden" name="end_time" value="{{ end_time }}">
+                            <button type="submit" class="seat-node available"><i class="bi bi-person-fill"></i></button>
+                        </form>
+                        {% else %}
+                        <span class="seat-node full"><i class="bi bi-person-fill"></i></span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="desk-label">{{ desk_name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h5 class="seat-section-title mt-4">2-Seater Desks</h5>
+        <div class="desk-row">
+            {% for desk_name, seats in pair_desks.items()|sort %}
+            <div class="desk-cluster pair">
+                {% for seat in seats %}
+                    {% if seat_status[seat.seat_id] == 'available' %}
+                    <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}">
+                        <input type="hidden" name="booking_date" value="{{ booking_date }}">
+                        <input type="hidden" name="start_time" value="{{ start_time }}">
+                        <input type="hidden" name="end_time" value="{{ end_time }}">
+                        <button type="submit" class="seat-node available"><i class="bi bi-person-fill"></i></button>
+                    </form>
+                    {% else %}
+                    <span class="seat-node full"><i class="bi bi-person-fill"></i></span>
+                    {% endif %}
+                    {% if loop.first %}<div class="desk-table pair-table"></div>{% endif %}
+                {% endfor %}
+                <div class="desk-label">{{ desk_name }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h5 class="seat-section-title mt-4">Single Desks</h5>
+        <div class="single-desk-grid">
+            {% for seat in single_seats %}
+                {% if seat_status[seat.seat_id] == 'available' %}
+                <form method="POST" action="{{ url_for('student_bp.book_seat_route', seat_id=seat.seat_id) }}">
+                    <input type="hidden" name="booking_date" value="{{ booking_date }}">
+                    <input type="hidden" name="start_time" value="{{ start_time }}">
+                    <input type="hidden" name="end_time" value="{{ end_time }}">
+                    <button type="submit" class="single-desk-card available"><i class="bi bi-person-fill"></i><span>{{ seat.seat_number }}</span></button>
+                </form>
+                {% else %}
+                <span class="single-desk-card full"><i class="bi bi-person-fill"></i><span>{{ seat.seat_number }}</span></span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="col-12 col-xl-3">
+        <div class="panel">
+            <div class="panel-kicker">SELECTED</div>
+            <p class="mb-1"><b>{{ booking_date }}</b></p>
+            <p class="text-muted">{{ display_start }} – {{ display_end }}</p>
+            <a href="{{ url_for('student_bp.select_seat_time') }}" class="btn secondary-btn w-100 mt-2">Change time</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

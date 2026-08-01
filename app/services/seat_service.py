@@ -93,3 +93,31 @@ def get_seat_availability(seat_id, booking_date):
         })
 
     return slots
+
+def get_seats_with_today_status(seats):
+    today = date.today()
+    result = {}
+    for seat in seats:
+        slots = get_seat_availability(seat.seat_id, today)
+        has_open_slot = any(not slot['booked'] for slot in slots)
+        result[seat.seat_id] = 'available' if has_open_slot else 'full'
+    return result
+
+
+def get_seats_status_for_slot(seats, booking_date, start_time, end_time):
+    seat_ids = [s.seat_id for s in seats]
+
+    conflicting = SeatBooking.query.filter(
+        SeatBooking.seat_seat_id.in_(seat_ids),
+        SeatBooking.booking_date == booking_date,
+        SeatBooking.status != 'cancelled',
+        SeatBooking.start_time < end_time,
+        SeatBooking.end_time > start_time
+    ).all()
+
+    booked_seat_ids = {b.seat_seat_id for b in conflicting}
+
+    return {
+        seat.seat_id: ('full' if seat.seat_id in booked_seat_ids else 'available')
+        for seat in seats
+    }
