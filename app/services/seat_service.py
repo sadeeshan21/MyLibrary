@@ -1,10 +1,7 @@
-from datetime import date, time
+from datetime import date, time, datetime
 from sqlalchemy import and_
 from app import db
 from app.models.models import Seat, SeatBooking
-from datetime import date, time, datetime
-from datetime import date, time, datetime
-
 
 
 
@@ -73,7 +70,7 @@ def get_seat_availability(seat_id, booking_date):
     existing_bookings = SeatBooking.query.filter(
         SeatBooking.seat_seat_id == seat_id,
         SeatBooking.booking_date == booking_date,
-        SeatBooking.status != 'cancelled'
+        SeatBooking.status.notin_(['cancelled', 'rejected'])
     ).all()
 
     slots = []
@@ -110,7 +107,7 @@ def get_seats_status_for_slot(seats, booking_date, start_time, end_time):
     conflicting = SeatBooking.query.filter(
         SeatBooking.seat_seat_id.in_(seat_ids),
         SeatBooking.booking_date == booking_date,
-        SeatBooking.status != 'cancelled',
+        SeatBooking.status.notin_(['cancelled', 'rejected']),
         SeatBooking.start_time < end_time,
         SeatBooking.end_time > start_time
     ).all()
