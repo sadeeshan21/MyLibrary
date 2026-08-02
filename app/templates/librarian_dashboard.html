@@ -12,57 +12,58 @@
 
 <div class="row g-4 metric-row">
     <div class="col-12 col-sm-6 col-xxl-3">
-        <div class="metric-card">
-            <div class="metric-top">
-                <div class="metric-icon blue"><i class="bi bi-journals"></i></div>
+        <a href="{{ url_for('librarian_bp.manage_books') }}" class="text-decoration-none d-block h-100">
+            <div class="metric-card">
+                <div class="metric-top"><div class="metric-icon blue"><i class="bi bi-journals"></i></div></div>
+                <span class="metric-label">Total books</span>
+                <div class="metric-value">{{ stats.total_books }}</div>
             </div>
-            <span class="metric-label">Total books</span>
-            <div class="metric-value">{{ stats.total_books }}</div>
-        </div>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xxl-3">
-        <div class="metric-card">
-            <div class="metric-top">
-                <div class="metric-icon teal"><i class="bi bi-people"></i></div>
+        <a href="{{ url_for('librarian_bp.manage_students') }}" class="text-decoration-none d-block h-100">
+            <div class="metric-card">
+                <div class="metric-top"><div class="metric-icon teal"><i class="bi bi-people"></i></div></div>
+                <span class="metric-label">Total students</span>
+                <div class="metric-value">{{ stats.total_students }}</div>
             </div>
-            <span class="metric-label">Total students</span>
-            <div class="metric-value">{{ stats.total_students }}</div>
-        </div>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xxl-3">
-        <div class="metric-card">
-            <div class="metric-top">
-                <div class="metric-icon cyan"><i class="bi bi-arrow-left-right"></i></div>
+        <a href="{{ url_for('librarian_bp.manage_borrowed_books', filter='active') }}" class="text-decoration-none d-block h-100">
+            <div class="metric-card">
+                <div class="metric-top"><div class="metric-icon cyan"><i class="bi bi-arrow-left-right"></i></div></div>
+                <span class="metric-label">Currently borrowed</span>
+                <div class="metric-value">{{ stats.currently_borrowed }}</div>
             </div>
-            <span class="metric-label">Currently borrowed</span>
-            <div class="metric-value">{{ stats.currently_borrowed }}</div>
-        </div>
+        </a>
     </div>
     <div class="col-12 col-sm-6 col-xxl-3">
-        <div class="metric-card">
-            <div class="metric-top">
-                <div class="metric-icon amber"><i class="bi bi-clock-history"></i></div>
+        <a href="{{ url_for('librarian_bp.manage_borrowed_books', filter='overdue') }}" class="text-decoration-none d-block h-100">
+            <div class="metric-card">
+                <div class="metric-top"><div class="metric-icon amber"><i class="bi bi-clock-history"></i></div></div>
+                <span class="metric-label">Overdue books</span>
+                <div class="metric-value">{{ stats.overdue_count }}</div>
             </div>
-            <span class="metric-label">Overdue books</span>
-            <div class="metric-value">{{ stats.overdue_count }}</div>
-        </div>
+        </a>
     </div>
 </div>
 
-<div class="row g-4 mt-1">
-    <div class="col-12 col-xxl-6">
-        <section class="panel h-100">
-            <div class="panel-header">
-                <div>
-                    <div class="panel-kicker">TODAY</div>
-                    <h3>Seats booked today</h3>
-                </div>
+<div class="row g-4 metric-row">
+    <section class="panel h-100 col-12 col-xxl-6">
+        <div class="panel-header">
+            <div>
+                <div class="panel-kicker">TODAY</div>
+                <h3>Seats booked today</h3>
             </div>
-            <div class="chart-wrap d-flex align-items-center justify-content-center">
+        </div>
+        <div class="chart-wrap d-flex align-items-center justify-content-center">
+            <a href="{{ url_for('librarian_bp.todays_seat_bookings') }}" class="text-decoration-none d-flex align-items-center justify-content-center w-100 h-100">
                 <div class="metric-value" style="font-size:3rem;">{{ stats.seats_booked_today }}</div>
-            </div>
-        </section>
-    </div>
+            </a>
+        </div>
+    </section>
+</div>
 
     <div class="col-12 col-xxl-6">
         <section class="panel h-100">

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}My Profile · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">ACCOUNT</div>
+        <h1>My profile</h1>
+        <p>Your account details.</p>
+    </div>
+</section>
+
+<div class="row g-4">
+    <div class="col-12 col-lg-4">
+        <section class="panel text-center">
+            <div class="table-avatar mx-auto mb-3" style="width:64px;height:64px;font-size:1.5rem;">{{ user.name[0] }}</div>
+            <h4 class="mb-1">{{ user.name }}</h4>
+            <span class="category-chip">{{ user.role|capitalize }}</span>
+        </section>
+    </div>
+
+    <div class="col-12 col-lg-8">
+        <section class="panel">
+            <div class="panel-header">
+                <div><div class="panel-kicker">DETAILS</div><h3>Account information</h3></div>
+            </div>
+            <table class="table modern-table mb-0">
+                <tbody>
+                    <tr><td class="text-muted">User ID</td><td><b>{{ user.user_id }}</b></td></tr>
+                    <tr><td class="text-muted">Full name</td><td><b>{{ user.name }}</b></td></tr>
+                    <tr><td class="text-muted">Email</td><td><b>{{ user.email }}</b></td></tr>
+                    <tr><td class="text-muted">Phone</td><td><b>{{ user.phone }}</b></td></tr>
+                    <tr><td class="text-muted">Role</td><td><b>{{ user.role|capitalize }}</b></td></tr>
+                    <tr><td class="text-muted">Member since</td><td><b>{{ user.created_at.strftime('%d %b %Y') }}</b></td></tr>
+
+                    {% if user.role == 'student' and user.student %}
+                    <tr><td class="text-muted">Student ID</td><td><b>{{ user.student.student_id_number }}</b></td></tr>
+                    <tr><td class="text-muted">Department</td><td><b>{{ user.student.department }}</b></td></tr>
+                    <tr><td class="text-muted">Year of study</td><td><b>{{ user.student.year_of_study }}</b></td></tr>
+                    {% elif user.role == 'faculty' and user.faculty %}
+                    <tr><td class="text-muted">Staff ID</td><td><b>{{ user.faculty.staff_id_number }}</b></td></tr>
+                    <tr><td class="text-muted">Department</td><td><b>{{ user.faculty.department }}</b></td></tr>
+                    <tr><td class="text-muted">Designation</td><td><b>{{ user.faculty.designation }}</b></td></tr>
+                    {% elif user.role == 'librarian' and user.librarian %}
+                    <tr><td class="text-muted">Staff ID</td><td><b>{{ user.librarian.staff_id_number }}</b></td></tr>
+                    <tr><td class="text-muted">Shift</td><td><b>{{ user.librarian.shift|capitalize }}</b></td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+{% endblock %}

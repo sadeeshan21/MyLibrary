@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Library Management System{% endblock %}</title>
+    <title>{% block title %}MyLibrary{% endblock %}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -25,9 +25,6 @@
 
         {% if current_user.is_authenticated and current_user.role == 'librarian' %}
         <nav class="side-nav">
-            <a class="side-link {% if request.endpoint == 'librarian_bp.manage_seat_bookings' %}active{% endif %}" href="{{ url_for('librarian_bp.manage_seat_bookings') }}">
-                <i class="bi bi-calendar-check"></i><span>Seat Bookings</span>
-            </a>
             <a class="side-link {% if request.endpoint == 'librarian_bp.dashboard' %}active{% endif %}" href="{{ url_for('librarian_bp.dashboard') }}">
                 <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
             </a>
@@ -36,6 +33,9 @@
             </a>
             <a class="side-link {% if request.endpoint == 'librarian_bp.manage_reservations' %}active{% endif %}" href="{{ url_for('librarian_bp.manage_reservations') }}">
                 <i class="bi bi-bookmark-check"></i><span>Reservations</span>
+            </a>
+            <a class="side-link {% if request.endpoint == 'librarian_bp.manage_seat_bookings' %}active{% endif %}" href="{{ url_for('librarian_bp.manage_seat_bookings') }}">
+                <i class="bi bi-calendar-check"></i><span>Seat Bookings</span>
             </a>
         </nav>
         {% elif current_user.is_authenticated %}
@@ -80,13 +80,13 @@
 
             <div class="topbar-actions">
                 {% if current_user.is_authenticated %}
-                <div class="profile">
+                <a href="{{ url_for('auth_bp.profile') }}" class="profile text-decoration-none">
                     <div class="avatar">{{ current_user.name[0] }}</div>
                     <div class="d-none d-lg-block">
                         <strong>{{ current_user.name }}</strong>
                         <small>{{ current_user.role|capitalize }}</small>
                     </div>
-                </div>
+                </a>
                 <a class="btn icon-btn" href="{{ url_for('auth_bp.logout') }}" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
                 {% else %}
                 <a class="btn quick-btn" href="{{ url_for('auth_bp.login') }}">Login</a>

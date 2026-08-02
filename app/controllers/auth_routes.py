@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, login_required
 from app import db
 from app.models.models import User, Student, Faculty, Librarian
 from datetime import datetime
+from flask_login import login_user, logout_user, login_required, current_user
 
 auth_bp = Blueprint('auth_bp', __name__)
 
@@ -77,3 +78,8 @@ def logout():
     logout_user()
     flash('You have been logged out.')
     return redirect(url_for('auth_bp.login'))
+
+@auth_bp.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)

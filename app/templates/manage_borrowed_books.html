@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Borrowed Books · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">CIRCULATION</div>
+        <h1>{% if filter_status == 'overdue' %}Overdue books{% else %}Borrowed books{% endif %}</h1>
+        <p>{% if filter_status == 'overdue' %}Loans that have passed their due date.{% else %}All borrow records across the library.{% endif %}</p>
+    </div>
+    <div class="heading-actions">
+        <a href="{{ url_for('librarian_bp.manage_borrowed_books') }}" class="btn {% if not filter_status %}primary-btn{% else %}secondary-btn{% endif %} btn-sm">All</a>
+        <a href="{{ url_for('librarian_bp.manage_borrowed_books', filter='active') }}" class="btn {% if filter_status == 'active' %}primary-btn{% else %}secondary-btn{% endif %} btn-sm">Active</a>
+        <a href="{{ url_for('librarian_bp.manage_borrowed_books', filter='overdue') }}" class="btn {% if filter_status == 'overdue' %}primary-btn{% else %}secondary-btn{% endif %} btn-sm">Overdue</a>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr><th>MEMBER</th><th>BOOK</th><th>BORROW DATE</th><th>DUE DATE</th><th>STATUS</th></tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="table-avatar">{{ r.user.name[0] }}</div>
+                            <div><b>{{ r.user.name }}</b><span>{{ r.user.role|capitalize }}</span></div>
+                        </div>
+                    </td>
+                    <td><b>{{ r.book_copy.book.title }}</b></td>
+                    <td>{{ r.borrow_date.strftime('%d %b %Y') }}</td>
+                    <td>{{ r.due_date.strftime('%d %b %Y') }}</td>
+                    <td>
+                        {% if r.status == 'overdue' %}<span class="status-pill danger">Overdue</span>
+                        {% elif r.status == 'returned' %}<span class="status-pill neutral">Returned</span>
+                        {% else %}<span class="status-pill ready">Active</span>{% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No records found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

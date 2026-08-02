@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Today's Seat Bookings · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">STUDY SPACE</div>
+        <h1>Today's seat bookings</h1>
+        <p>Confirmed bookings for {{ "today" }}.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr><th>MEMBER</th><th>SEAT</th><th>TIME</th></tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="table-avatar">{{ b.user.name[0] }}</div>
+                            <div><b>{{ b.user.name }}</b></div>
+                        </div>
+                    </td>
+                    <td><b>{{ b.seat.seat_number }}</b></td>
+                    <td>{{ b.start_time.strftime('%H:%M') }} - {{ b.end_time.strftime('%H:%M') }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="text-center text-muted py-4">No confirmed bookings for today.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}

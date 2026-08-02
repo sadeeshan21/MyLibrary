@@ -161,3 +161,38 @@ def reject_seat_booking_route(booking_id):
     except SeatBookingActionError as e:
         flash(str(e))
     return redirect(url_for('librarian_bp.manage_seat_bookings'))
+
+
+@librarian_bp.route('/librarian/students')
+@login_required
+@role_required('librarian')
+def manage_students():
+    students = User.query.filter_by(role='student').all()
+    return render_template('manage_students.html', students=students)
+
+
+@librarian_bp.route('/librarian/borrowed-books')
+@login_required
+@role_required('librarian')
+def manage_borrowed_books():
+    filter_status = request.args.get('filter')
+
+    query = BorrowedBook.query
+    if filter_status == 'overdue':
+        query = query.filter_by(status='overdue')
+    elif filter_status == 'active':
+        query = query.filter_by(status='active')
+
+    records = query.all()
+    return render_template('manage_borrowed_books.html', records=records, filter_status=filter_status)
+
+
+@librarian_bp.route('/librarian/seat-bookings/today')
+@login_required
+@role_required('librarian')
+def todays_seat_bookings():
+    today_bookings = SeatBooking.query.filter_by(
+        booking_date=date.today(),
+        status='confirmed'
+    ).all()
+    return render_template('todays_seat_bookings.html', bookings=today_bookings)

@@ -560,3 +560,6 @@ a{text-decoration:none}
     border-color: #1a2b4c;
     color: white;
 }
+
+.metric-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+a:hover .metric-card { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); cursor: pointer; }

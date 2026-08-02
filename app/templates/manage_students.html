@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Students · MyLibrary{% endblock %}
+{% block content %}
+
+<section class="page-heading">
+    <div>
+        <div class="eyebrow">MEMBERS</div>
+        <h1>Students</h1>
+        <p>All registered student accounts.</p>
+    </div>
+</section>
+
+<section class="panel p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table modern-table catalog-table align-middle mb-0">
+            <thead>
+                <tr><th>STUDENT</th><th>STUDENT ID</th><th>DEPARTMENT</th><th>EMAIL</th><th>PHONE</th></tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="table-avatar">{{ s.name[0] }}</div>
+                            <div><b>{{ s.name }}</b></div>
+                        </div>
+                    </td>
+                    <td>{{ s.student.student_id_number if s.student else '—' }}</td>
+                    <td>{{ s.student.department if s.student else '—' }}</td>
+                    <td>{{ s.email }}</td>
+                    <td>{{ s.phone }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No students registered yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}
