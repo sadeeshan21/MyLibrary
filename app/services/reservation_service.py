@@ -47,7 +47,21 @@ def cancel_reservation(reservation_id, user_id):
     if reservation.user_user_id != user_id:
         raise ReservationError("You can only cancel your own reservations.")
 
+    cancelled_position = reservation.queue_position
+    book_id = reservation.book_book_id
+
     reservation.status = 'cancelled'
+
+    # Re-number everyone behind the cancelled reservation, so the queue stays accurate
+    remaining = Reservation.query.filter(
+        Reservation.book_book_id == book_id,
+        Reservation.status == 'pending',
+        Reservation.queue_position > cancelled_position
+    ).all()
+
+    for r in remaining:
+        r.queue_position -= 1
+
     db.session.commit()
 
     return reservation

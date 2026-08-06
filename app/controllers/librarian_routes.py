@@ -10,7 +10,11 @@ from app.services.book_service import add_book, update_book, BookError
 from app.services.seat_service import approve_seat_booking, reject_seat_booking, SeatBookingActionError
 from app.models.models import SeatBooking
 from app.models.models import Book, BookCopy, BorrowedBook, SeatBooking, Reservation, User, Category
-
+from app.services.borrow_service import mark_overdue_loans
+from flask import Response
+import csv
+import io
+from app import db
 
 librarian_bp = Blueprint('librarian_bp', __name__)
 
@@ -196,3 +200,59 @@ def todays_seat_bookings():
         status='confirmed'
     ).all()
     return render_template('todays_seat_bookings.html', bookings=today_bookings)
+
+@librarian_bp.route('/librarian/run-overdue-check', methods=['POST'])
+@login_required
+@role_required('librarian')
+def run_overdue_check():
+    count = mark_overdue_loans()
+    flash(f'{count} loan(s) marked as overdue.')
+    return redirect(url_for('librarian_bp.dashboard'))
+
+
+@librarian_bp.route('/librarian/reports/overdue')
+@login_required
+@role_required('librarian')
+def export_overdue_report():
+    overdue = BorrowedBook.query.filter_by(status='overdue').all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Borrower', 'Role', 'Book', 'Borrow Date', 'Due Date', 'Fine Amount'])
+
+    for r in overdue:
+        writer.writerow([
+            r.user.name, r.user.role, r.book_copy.book.title,
+            r.borrow_date, r.due_date, r.fine_amount
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=overdue_report.csv'}
+    )
+
+
+@librarian_bp.route('/librarian/reports/most-borrowed')
+@login_required
+@role_required('librarian')
+def export_most_borrowed_report():
+    from app.models.models import BookCopy
+    results = db.session.query(
+        Book.title, db.func.count(BorrowedBook.borrow_id).label('times_borrowed')
+    ).join(BookCopy, BookCopy.book_book_id == Book.book_id
+    ).join(BorrowedBook, BorrowedBook.book_copy_copy_id == BookCopy.copy_id
+    ).group_by(Book.book_id, Book.title
+    ).order_by(db.func.count(BorrowedBook.borrow_id).desc()).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Book Title', 'Times Borrowed'])
+    for title, count in results:
+        writer.writerow([title, count])
+
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=most_borrowed_report.csv'}
+    )

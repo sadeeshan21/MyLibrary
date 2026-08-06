@@ -10,6 +10,13 @@
     </div>
 </section>
 
+<a href="{{ url_for('librarian_bp.export_overdue_report') }}" class="btn secondary-btn btn-sm">Export overdue (CSV)</a>
+<a href="{{ url_for('librarian_bp.export_most_borrowed_report') }}" class="btn secondary-btn btn-sm">Export most borrowed (CSV)</a>
+
+<form method="POST" action="{{ url_for('librarian_bp.run_overdue_check') }}">
+    <button type="submit" class="btn secondary-btn btn-sm">Run overdue check</button>
+</form>
+
 <div class="row g-4 metric-row">
     <div class="col-12 col-sm-6 col-xxl-3">
         <a href="{{ url_for('librarian_bp.manage_books') }}" class="text-decoration-none d-block h-100">
